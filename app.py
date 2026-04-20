@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 ENDPOINT_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
 
+API_KEY = "eyJraWQiOiIzYzhlNzA3OTEyZmI0NTA1ODE3NzE3YzMyOTU4MmQwMTFjYjlmNTAwIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJnaXJpc2hwIiwiYXVkIjoiaHR0cHM6Ly9kZS55bGN1LWF0bWkuY2xvdWRlcmEuc2l0ZSIsImlzcyI6Imh0dHBzOi8vY29uc29sZWF1dGguY2RwLmNsb3VkZXJhLmNvbS84YTFlMTVjZC0wNGMyLTQ4YWEtOGYzNS1iNGE4YzExOTk3ZDMiLCJncm91cHMiOiJjZHBfZGVtb3Nfd29ya2Vyc193dyBfY19kZl9hZG1pbmlzdGVyXzZmNTllOWYzIF9jX2RmX3B1Ymxpc2hfNmY1OWU5ZjMgX2NfZGZfZGV2ZWxvcF85MTE0NjNjIF9jX2RmX3ZpZXdfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfOTExNDYzYyBfY19kZl9hZG1pbmlzdGVyXzkxMTQ2M2MgX2NfZW52X2Fzc2lnbmVlc182ZjU5ZTlmMyBfY19yYW5nZXJfYWRtaW5zXzZmNTllOWYzIF9jX3Jhbmdlcl9hZG1pbnNfOTExNDYzYyBfY19kZV91c2Vyc185MTE0NjNjIF9jX2RmX3ZpZXdfOTExNDYzYyBfY19tbF91c2Vyc185MTE0NjNjIF9jX2RmX3B1Ymxpc2hfOTExNDYzYyBfY19kZl92aWV3XzkxMTQ2M2MwIF9jX2Vudl9hc3NpZ25lZXNfOTExNDYzYyBfY19tbF91c2Vyc182ZjU5ZTlmMyBfY19kZl92aWV3XzZmNTllOWYzMCBfY19tbF91c2Vyc180ZDgzYWQ3ZiBfY19kZl9kZXZlbG9wXzZmNTllOWYzIF9jX2RlX3VzZXJzXzZmNTllOWYzIiwiZXhwIjoxNzc2NzE0NjM4LCJ0eXBlIjoidXNlciIsImdpdmVuX25hbWUiOiJHaXJpc2giLCJpYXQiOjE3NzY3MTEwMzgsImZhbWlseV9uYW1lIjoiUGFydWxrYXIiLCJlbWFpbCI6ImdpcmlzaHBAY2xvdWRlcmEuY29tIn0.WQe65aZx3mhxMOwT80fQxADXVDT3n0Gn-dcfScndj9v_GTZ0QzEHddPMalvAoeK7gyu2WhfD1lapdbCeUeGkSm_9Wx3AAwOBu7SVrE7lye7sgVdE1vFLAw-x8H7w1BYasvYCFKydiq7zigbWwdl5lmMVqHrRecwUd_63LMdsYGUV6HA5r9k05OIMATaJA828jQI7LwsVYe7Q_gHu3HWlhE8BtEwsFUnrZ_BCEUBVVpwfDlPx9bJm_4ehY9CsjmqF6oNc1aMZm-mvfRvLrfrwCMLbiclb_mvhgenhtibk624s0jlyljef7jmC6hBzf18aClOBn5G90SVjHQsJ2l5cdg"
+
 HTML = """
 <!doctype html>
 <html>
@@ -48,13 +50,6 @@ HTML = """
 </html>
 """
 
-def get_api_key() -> str:
-    jwt_path = "/tmp/jwt"
-    if os.path.exists(jwt_path):
-        with open(jwt_path, "r") as f:
-            return json.load(f)["access_token"]
-    return os.environ.get("IRIS_AUTH_TOKEN", "")
-
 @app.route("/", methods=["GET", "POST"])
 def home():
     ctx = {
@@ -83,11 +78,10 @@ def home():
                 ]]
             }
 
-            api_key = get_api_key()
-            headers = {"Content-Type": "application/json"}
-
-            if api_key:
-                headers["Authorization"] = f"Bearer {api_key}"
+            headers = {
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json",
+            }
 
             r = requests.post(
                 ENDPOINT_URL,

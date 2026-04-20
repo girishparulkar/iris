@@ -69,13 +69,22 @@ def home():
             ctx["petal_length"] = request.form.get("petal_length", "1.4")
             ctx["petal_width"] = request.form.get("petal_width", "0.2")
 
+            values = [
+                float(ctx["sepal_length"]),
+                float(ctx["sepal_width"]),
+                float(ctx["petal_length"]),
+                float(ctx["petal_width"]),
+            ]
+
             payload = {
-                "inputs": [[
-                    float(ctx["sepal_length"]),
-                    float(ctx["sepal_width"]),
-                    float(ctx["petal_length"]),
-                    float(ctx["petal_width"]),
-                ]]
+                "inputs": [
+                    {
+                        "name": "input-0",
+                        "shape": [1, 4],
+                        "datatype": "FP32",
+                        "data": [values]
+                    }
+                ]
             }
 
             headers = {

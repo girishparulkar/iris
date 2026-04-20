@@ -5,12 +5,9 @@ from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-BASE_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint"
-MODEL_NAME = "00zs-5ozn-ebe8-4nr5"
-API_KEY = "eyJraWQiOiIzYzhlNzA3OTEyZmI0NTA1ODE3NzE3YzMyOTU4MmQwMTFjYjlmNTAwIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJnaXJpc2hwIiwiYXVkIjoiaHR0cHM6Ly9kZS55bGN1LWF0bWkuY2xvdWRlcmEuc2l0ZSIsImlzcyI6Imh0dHBzOi8vY29uc29sZWF1dGguY2RwLmNsb3VkZXJhLmNvbS84YTFlMTVjZC0wNGMyLTQ4YWEtOGYzNS1iNGE4YzExOTk3ZDMiLCJncm91cHMiOiJjZHBfZGVtb3Nfd29ya2Vyc193dyBfY19kZl9hZG1pbmlzdGVyXzZmNTllOWYzIF9jX2RmX3B1Ymxpc2hfNmY1OWU5ZjMgX2NfZGZfZGV2ZWxvcF85MTE0NjNjIF9jX2RmX3ZpZXdfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfOTExNDYzYyBfY19kZl9hZG1pbmlzdGVyXzkxMTQ2M2MgX2NfZW52X2Fzc2lnbmVlc182ZjU5ZTlmMyBfY19yYW5nZXJfYWRtaW5zXzZmNTllOWYzIF9jX3Jhbmdlcl9hZG1pbnNfOTExNDYzYyBfY19kZV91c2Vyc185MTE0NjNjIF9jX2RmX3ZpZXdfOTExNDYzYyBfY19tbF91c2Vyc185MTE0NjNjIF9jX2RmX3B1Ymxpc2hfOTExNDYzYyBfY19kZl92aWV3XzkxMTQ2M2MwIF9jX2Vudl9hc3NpZ25lZXNfOTExNDYzYyBfY19tbF91c2Vyc182ZjU5ZTlmMyBfY19kZl92aWV3XzZmNTllOWYzMCBfY19tbF91c2Vyc180ZDgzYWQ3ZiBfY19kZl9kZXZlbG9wXzZmNTllOWYzIF9jX2RlX3VzZXJzXzZmNTllOWYzIiwiZXhwIjoxNzc2NzE0NjM4LCJ0eXBlIjoidXNlciIsImdpdmVuX25hbWUiOiJHaXJpc2giLCJpYXQiOjE3NzY3MTEwMzgsImZhbWlseV9uYW1lIjoiUGFydWxrYXIiLCJlbWFpbCI6ImdpcmlzaHBAY2xvdWRlcmEuY29tIn0.WQe65aZx3mhxMOwT80fQxADXVDT3n0Gn-dcfScndj9v_GTZ0QzEHddPMalvAoeK7gyu2WhfD1lapdbCeUeGkSm_9Wx3AAwOBu7SVrE7lye7sgVdE1vFLAw-x8H7w1BYasvYCFKydiq7zigbWwdl5lmMVqHrRecwUd_63LMdsYGUV6HA5r9k05OIMATaJA828jQI7LwsVYe7Q_gHu3HWlhE8BtEwsFUnrZ_BCEUBVVpwfDlPx9bJm_4ehY9CsjmqF6oNc1aMZm-mvfRvLrfrwCMLbiclb_mvhgenhtibk624s0jlyljef7jmC6hBzf18aClOBn5G90SVjHQsJ2l5cdg"
+ENDPOINT_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
 
-METADATA_URL = f"{BASE_URL}/v2/models/{MODEL_NAME}"
-INFER_URL = f"{BASE_URL}/v2/models/{MODEL_NAME}/infer"
+API_KEY = "eyJraWQiOiIzYzhlNzA3OTEyZmI0NTA1ODE3NzE3YzMyOTU4MmQwMTFjYjlmNTAwIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJnaXJpc2hwIiwiYXVkIjoiaHR0cHM6Ly9kZS55bGN1LWF0bWkuY2xvdWRlcmEuc2l0ZSIsImlzcyI6Imh0dHBzOi8vY29uc29sZWF1dGguY2RwLmNsb3VkZXJhLmNvbS84YTFlMTVjZC0wNGMyLTQ4YWEtOGYzNS1iNGE4YzExOTk3ZDMiLCJncm91cHMiOiJjZHBfZGVtb3Nfd29ya2Vyc193dyBfY19kZl9hZG1pbmlzdGVyXzZmNTllOWYzIF9jX2RmX3B1Ymxpc2hfNmY1OWU5ZjMgX2NfZGZfZGV2ZWxvcF85MTE0NjNjIF9jX2RmX3ZpZXdfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfNmY1OWU5ZjMgX2NfbWxfYnVzaW5lc3NfdXNlcnNfOTExNDYzYyBfY19kZl9hZG1pbmlzdGVyXzkxMTQ2M2MgX2NfZW52X2Fzc2lnbmVlc182ZjU5ZTlmMyBfY19yYW5nZXJfYWRtaW5zXzZmNTllOWYzIF9jX3Jhbmdlcl9hZG1pbnNfOTExNDYzYyBfY19kZV91c2Vyc185MTE0NjNjIF9jX2RmX3ZpZXdfOTExNDYzYyBfY19tbF91c2Vyc185MTE0NjNjIF9jX2RmX3B1Ymxpc2hfOTExNDYzYyBfY19kZl92aWV3XzkxMTQ2M2MwIF9jX2Vudl9hc3NpZ25lZXNfOTExNDYzYyBfY19tbF91c2Vyc182ZjU5ZTlmMyBfY19kZl92aWV3XzZmNTllOWYzMCBfY19tbF91c2Vyc180ZDgzYWQ3ZiBfY19kZl9kZXZlbG9wXzZmNTllOWYzIF9jX2RlX3VzZXJzXzZmNTllOWYzIiwiZXhwIjoxNzc2NzE0NjM4LCJ0eXBlIjoidXNlciIsImdpdmVuX25hbWUiOiJHaXJpc2giLCJpYXQiOjE3NzY3MTEwMzgsImZhbWlseV9uYW1lIjoiUGFydWxrYXIiLCJlbWFpbCI6ImdpcmlzaHBAY2xvdWRlcmEuY29tIn0.WQe65aZx3mhxMOwT80fQxADXVDT3n0Gn-dcfScndj9v_GTZ0QzEHddPMalvAoeK7gyu2WhfD1lapdbCeUeGkSm_9Wx3AAwOBu7SVrE7lye7sgVdE1vFLAw-x8H7w1BYasvYCFKydiq7zigbWwdl5lmMVqHrRecwUd_63LMdsYGUV6HA5r9k05OIMATaJA828jQI7LwsVYe7Q_gHu3HWlhE8BtEwsFUnrZ_BCEUBVVpwfDlPx9bJm_4ehY9CsjmqF6oNc1aMZm-mvfRvLrfrwCMLbiclb_mvhgenhtibk624s0jlyljef7jmC6hBzf18aClOBn5G90SVjHQsJ2l5cdg"
 
 HTML = """
 <!doctype html>
@@ -18,9 +15,9 @@ HTML = """
   <head>
     <title>CAI Demo - Iris Prediction</title>
     <style>
-      body { font-family: Arial, sans-serif; margin: 40px; max-width: 900px; }
+      body { font-family: Arial, sans-serif; margin: 40px; max-width: 720px; }
       input { margin: 6px 0; padding: 6px; width: 220px; }
-      button { margin-top: 12px; padding: 8px 14px; margin-right: 8px; }
+      button { margin-top: 12px; padding: 8px 14px; }
       .box { margin-top: 20px; padding: 12px; background: #f4f4f4; border-radius: 6px; white-space: pre-wrap; }
       .err { color: #b00020; }
     </style>
@@ -33,9 +30,7 @@ HTML = """
       <div>Sepal width<br><input name="sepal_width" value="{{ sepal_width }}"></div>
       <div>Petal length<br><input name="petal_length" value="{{ petal_length }}"></div>
       <div>Petal width<br><input name="petal_width" value="{{ petal_width }}"></div>
-
-      <button type="submit" name="action" value="metadata">Show Metadata</button>
-      <button type="submit" name="action" value="predict">Predict</button>
+      <button type="submit">Predict</button>
     </form>
 
     {% if status is not none %}
@@ -55,12 +50,6 @@ HTML = """
 </html>
 """
 
-def auth_headers():
-    return {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json",
-    }
-
 @app.route("/", methods=["GET", "POST"])
 def home():
     ctx = {
@@ -75,33 +64,10 @@ def home():
 
     if request.method == "POST":
         try:
-            action = request.form.get("action", "predict")
-
             ctx["sepal_length"] = request.form.get("sepal_length", "5.1")
             ctx["sepal_width"] = request.form.get("sepal_width", "3.5")
             ctx["petal_length"] = request.form.get("petal_length", "1.4")
             ctx["petal_width"] = request.form.get("petal_width", "0.2")
-
-            if action == "metadata":
-                r = requests.get(METADATA_URL, headers=auth_headers(), timeout=30)
-                ctx["status"] = r.status_code
-                try:
-                    ctx["response_text"] = json.dumps(r.json(), indent=2)
-                except Exception:
-                    ctx["response_text"] = r.text
-                return render_template_string(HTML, **ctx)
-
-            # First fetch metadata so we know the real input name/datatype
-            meta_resp = requests.get(METADATA_URL, headers=auth_headers(), timeout=30)
-            meta_resp.raise_for_status()
-            metadata = meta_resp.json()
-
-            inputs = metadata.get("inputs", [])
-            if not inputs:
-                raise ValueError("No inputs found in model metadata")
-
-            input_name = inputs[0]["name"]
-            datatype = inputs[0].get("datatype", "FP32")
 
             values = [
                 float(ctx["sepal_length"]),
@@ -113,40 +79,31 @@ def home():
             payload = {
                 "inputs": [
                     {
-                        "name": input_name,
+                        "name": "INPUT__0",
                         "shape": [1, 4],
-                        "datatype": datatype,
+                        "datatype": "FP32",
                         "data": [values]
                     }
                 ]
             }
 
+            headers = {
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json",
+            }
+
             r = requests.post(
-                INFER_URL,
+                ENDPOINT_URL,
                 json=payload,
-                headers=auth_headers(),
+                headers=headers,
                 timeout=30
             )
 
             ctx["status"] = r.status_code
             try:
-                ctx["response_text"] = json.dumps(
-                    {
-                        "metadata_inputs": inputs,
-                        "request_payload": payload,
-                        "response": r.json()
-                    },
-                    indent=2
-                )
+                ctx["response_text"] = json.dumps(r.json(), indent=2)
             except Exception:
-                ctx["response_text"] = (
-                    "Metadata inputs:\\n"
-                    + json.dumps(inputs, indent=2)
-                    + "\\n\\nRequest payload:\\n"
-                    + json.dumps(payload, indent=2)
-                    + "\\n\\nRaw response:\\n"
-                    + r.text
-                )
+                ctx["response_text"] = r.text
 
         except Exception as e:
             ctx["error"] = str(e)

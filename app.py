@@ -1,15 +1,11 @@
-from flask import Flask, request, render_template_string
+import json
 import os
 import requests
+from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-ENDPOINT_URL = os.environ.get(
-    "IRIS_ENDPOINT_URL",
-    "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
-)
-
-AUTH_TOKEN = os.environ.get("IRIS_AUTH_TOKEN", "")
+ENDPOINT_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
 
 HTML = """
 <!doctype html>
@@ -39,9 +35,9 @@ HTML = """
       <div class="box">
         <b>Status:</b> {{ status }}
 
-        {% if response_text %}
+{% if response_text %}
 {{ response_text }}
-        {% endif %}
+{% endif %}
       </div>
     {% endif %}
 
@@ -51,6 +47,13 @@ HTML = """
   </body>
 </html>
 """
+
+def get_api_key() -> str:
+    jwt_path = "/tmp/jwt"
+    if os.path.exists(jwt_path):
+        with open(jwt_path, "r") as f:
+            return json.load(f)["access_token"]
+    return os.environ.get("IRIS_AUTH_TOKEN", "")
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -80,15 +83,22 @@ def home():
                 ]]
             }
 
+            api_key = get_api_key()
             headers = {"Content-Type": "application/json"}
-            if AUTH_TOKEN:
-                headers["Authorization"] = f"Bearer {AUTH_TOKEN}"
 
-            r = requests.post(ENDPOINT_URL, json=payload, headers=headers, timeout=30)
+            if api_key:
+                headers["Authorization"] = f"Bearer {api_key}"
+
+            r = requests.post(
+                ENDPOINT_URL,
+                json=payload,
+                headers=headers,
+                timeout=30
+            )
 
             ctx["status"] = r.status_code
             try:
-                ctx["response_text"] = r.json()
+                ctx["response_text"] = json.dumps(r.json(), indent=2)
             except Exception:
                 ctx["response_text"] = r.text
 

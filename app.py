@@ -6,7 +6,7 @@ from flask import Flask, request, render_template_string
 app = Flask(__name__)
 
 ENDPOINT_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
-API_KEY = "PASTE_YOUR_CDP_TOKEN_HERE"
+API_KEY = "TWpnM1pqZ3lNMkV0WWpNNVppMDBNemt5TFdFNVkyVXRPV1ExTldGbVlqYzROVGcxOjpaamMxWmprMU5tTXRaR05tTXkwME1ERmtMV0UyTXpZdE1ESTBNalF6TURKaU5UUmw="
 
 HTML = """
 <!doctype html>

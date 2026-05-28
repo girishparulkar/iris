@@ -6,14 +6,7 @@ from flask import Flask, request, render_template_string
 app = Flask(__name__)
 
 ENDPOINT_URL = "https://ml-64288d82-5dd.go01-dem.ylcu-atmi.cloudera.site/namespaces/serving-default/endpoints/iris-demo-endpoint/v2/models/00zs-5ozn-ebe8-4nr5/infer"
-API_KEY = "TWpnM1pqZ3lNMkV0WWpNNVppMDBNemt5TFdFNVkyVXRPV1ExTldGbVlqYzROVGcxOjpaamMxWmprMU5tTXRaR05tTXkwME1ERmtMV0UyTXpZdE1ESTBNalF6TURKaU5UUmw="
-           
-           
-LABELS = {
-    0: "setosa",
-    1: "versicolor",
-    2: "virginica",
-}
+API_KEY = "PASTE_YOUR_CDP_TOKEN_HERE"
 
 HTML = """
 <!doctype html>
@@ -60,6 +53,12 @@ HTML = """
   </body>
 </html>
 """
+
+LABELS = {
+    0: "setosa",
+    1: "versicolor",
+    2: "virginica",
+}
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -112,14 +111,22 @@ def home():
             )
 
             ctx["status"] = r.status_code
-            result = r.json()
-            ctx["response_text"] = json.dumps(result, indent=2)
 
             try:
-                pred_value = int(result["outputs"][0]["data"][0])
-                ctx["predicted_label"] = LABELS.get(pred_value, f"Unknown ({pred_value})")
+                result = r.json()
+                ctx["response_text"] = json.dumps(result, indent=2)
+
+                if (
+                    "outputs" in result and
+                    len(result["outputs"]) > 0 and
+                    "data" in result["outputs"][0] and
+                    len(result["outputs"][0]["data"]) > 0
+                ):
+                    pred_value = int(result["outputs"][0]["data"][0])
+                    ctx["predicted_label"] = LABELS.get(pred_value, f"Unknown ({pred_value})")
+
             except Exception:
-                pass
+                ctx["response_text"] = r.text if r.text else "<empty response>"
 
         except Exception as e:
             ctx["error"] = str(e)

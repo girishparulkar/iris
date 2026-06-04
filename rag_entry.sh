@@ -10,7 +10,7 @@ export APP_PORT=${APP_PORT:-8501}
 echo "Starting Streamlit app on port ${APP_PORT}..."
 
 # 4. Start the Streamlit application
-exec streamlit run app.py \
+exec streamlit run rag-chat-custom.py \
     --server.port="${APP_PORT}" \
     --server.address="0.0.0.0" \
     --server.headless=true

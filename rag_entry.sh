@@ -1,16 +1,14 @@
 #!/bin/bash
-
-# 1. Exit immediately if any command fails
 set -e
 
-# 2. Set a default port if APP_PORT is not provided by your platform
-export APP_PORT=${APP_PORT:-8501}
+PORT_TO_USE="${APP_PORT:-${PORT:-8080}}"
 
-# 3. Print the port for debugging logs
-echo "Starting Streamlit app on port ${APP_PORT}..."
+echo "Starting Streamlit app on port ${PORT_TO_USE}..."
 
-# 4. Start the Streamlit application
 exec streamlit run rag-chat-custom.py \
-    --server.port="${APP_PORT}" \
-    --server.address="0.0.0.0" \
-    --server.headless=true
+  --server.port="${PORT_TO_USE}" \
+  --server.address="0.0.0.0" \
+  --server.headless=true \
+  --browser.gatherUsageStats=false \
+  --server.enableCORS=false \
+  --server.enableXsrfProtection=false
